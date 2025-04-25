@@ -49,8 +49,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     }));
   };
 
+  // Fix: Check if each specialty is defined before calling toLowerCase
   const filteredSpecialties = allSpecialties.filter(specialty =>
-    specialty.toLowerCase().includes(searchTerm.toLowerCase())
+    specialty && specialty.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const clearAllFilters = () => {
