@@ -1,6 +1,7 @@
 
 import { Doctor } from "@/types/doctor";
 import { useState, useEffect, useRef } from "react";
+import { Search } from "lucide-react";
 
 interface SearchBarProps {
   suggestions: Doctor[];
@@ -34,34 +35,19 @@ const SearchBar: React.FC<SearchBarProps> = ({
     };
   }, []);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    onSearchChange(value);
-    setShowSuggestions(true);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      setShowSuggestions(false);
-    }
-  };
-
-  const handleSuggestionSelect = (doctor: Doctor) => {
-    onSuggestionClick(doctor);
-    setShowSuggestions(false);
-  };
-
   return (
-    <div className="relative w-full max-w-3xl mx-auto">
-      <div className="relative">
+    <div className="relative w-full max-w-4xl mx-auto">
+      <div className="relative bg-white rounded-lg shadow-sm">
+        <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
+        </div>
         <input
           type="text"
           data-testid="autocomplete-input"
-          className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-medical-blue"
-          placeholder="Search for doctors by name..."
+          className="w-full pl-12 pr-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-900 placeholder-gray-500"
+          placeholder="Search Symptoms, Doctors, Specialists, Clinics"
           value={searchTerm}
-          onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          onChange={(e) => onSearchChange(e.target.value)}
           onFocus={() => setShowSuggestions(true)}
         />
       </div>
@@ -75,10 +61,14 @@ const SearchBar: React.FC<SearchBarProps> = ({
             <div
               key={doctor.id}
               data-testid="suggestion-item"
-              className="p-3 hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleSuggestionSelect(doctor)}
+              className="p-3 hover:bg-gray-50 cursor-pointer"
+              onClick={() => {
+                onSuggestionClick(doctor);
+                setShowSuggestions(false);
+              }}
             >
-              {doctor.name}
+              <div className="font-medium">{doctor.name}</div>
+              <div className="text-sm text-gray-600">{doctor.specialties.join(", ")}</div>
             </div>
           ))}
         </div>
