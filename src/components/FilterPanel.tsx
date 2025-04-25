@@ -1,6 +1,20 @@
 
 import { ConsultationType, SortOption } from "@/hooks/useDoctorFilters";
 import { useState } from "react";
+import { Search } from "lucide-react";
+import { Input } from "./ui/input";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "./ui/card";
+import { Button } from "./ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./ui/collapsible";
 
 interface FilterPanelProps {
   allSpecialties: string[];
@@ -21,6 +35,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   onSpecialtyChange,
   onSortChange,
 }) => {
+  const [searchTerm, setSearchTerm] = useState("");
   const [expandedSections, setExpandedSections] = useState({
     consultationMode: true,
     specialties: true,
@@ -34,28 +49,84 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     }));
   };
 
-  const getSpecialtyTestId = (specialty: string) => {
-    // Fix: Add a null check before using replace
-    if (!specialty) return "";
-    // Format specialty for data-testid (replace spaces and special chars)
-    return specialty.replace(/[^a-zA-Z0-9]/g, "-");
+  const filteredSpecialties = allSpecialties.filter(specialty =>
+    specialty.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const clearAllFilters = () => {
+    onConsultationTypeChange("");
+    selectedSpecialties.forEach(specialty => onSpecialtyChange(specialty, false));
+    onSortChange("");
   };
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 sticky top-4 max-h-screen overflow-y-auto">
-      {/* Consultation Mode Filter */}
-      <div className="mb-6">
-        <h3 
-          data-testid="filter-header-moc" 
-          onClick={() => toggleSection("consultationMode")}
-          className="font-semibold text-lg mb-2 flex justify-between cursor-pointer"
+    <Card className="w-full max-w-xs">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardTitle className="text-lg font-medium">Filters</CardTitle>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="text-blue-600 hover:text-blue-700 p-0 h-auto"
+          onClick={clearAllFilters}
         >
-          Consultation Mode
-          <span>{expandedSections.consultationMode ? "−" : "+"}</span>
-        </h3>
-        {expandedSections.consultationMode && (
-          <div className="flex flex-col space-y-2">
-            <label className="flex items-center space-x-2">
+          Clear All
+        </Button>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        {/* Specialties Section */}
+        <Collapsible 
+          defaultOpen={true}
+          className="space-y-2"
+        >
+          <CollapsibleTrigger 
+            className="flex items-center justify-between w-full"
+            data-testid="filter-header-speciality"
+          >
+            <h3 className="text-sm font-medium">Specialities</h3>
+            <span>{expandedSections.specialties ? "−" : "+"}</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-2">
+            <div className="relative">
+              <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
+              <Input
+                type="text"
+                placeholder="Search specialties"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-8"
+              />
+            </div>
+            <div className="space-y-2 max-h-48 overflow-y-auto">
+              {filteredSpecialties.map((specialty) => (
+                <label
+                  key={specialty}
+                  className="flex items-center space-x-2 text-sm"
+                >
+                  <input
+                    type="checkbox"
+                    data-testid={`filter-specialty-${specialty.replace(/[^a-zA-Z0-9]/g, "-")}`}
+                    checked={selectedSpecialties.includes(specialty)}
+                    onChange={(e) => onSpecialtyChange(specialty, e.target.checked)}
+                    className="h-4 w-4 rounded border-gray-300"
+                  />
+                  <span>{specialty}</span>
+                </label>
+              ))}
+            </div>
+          </CollapsibleContent>
+        </Collapsible>
+
+        {/* Mode of Consultation */}
+        <Collapsible defaultOpen={true} className="space-y-2">
+          <CollapsibleTrigger 
+            className="flex items-center justify-between w-full"
+            data-testid="filter-header-moc"
+          >
+            <h3 className="text-sm font-medium">Mode of consultation</h3>
+            <span>{expandedSections.consultationMode ? "−" : "+"}</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 data-testid="filter-video-consult"
@@ -63,9 +134,9 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                 onChange={() => onConsultationTypeChange("Video Consult")}
                 className="h-4 w-4"
               />
-              <span>Video Consult</span>
+              <span>Video Consultation</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 data-testid="filter-in-clinic"
@@ -73,53 +144,22 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
                 onChange={() => onConsultationTypeChange("In Clinic")}
                 className="h-4 w-4"
               />
-              <span>In Clinic</span>
+              <span>In-clinic Consultation</span>
             </label>
-          </div>
-        )}
-      </div>
+          </CollapsibleContent>
+        </Collapsible>
 
-      {/* Specialties Filter */}
-      <div className="mb-6">
-        <h3 
-          data-testid="filter-header-speciality" 
-          onClick={() => toggleSection("specialties")}
-          className="font-semibold text-lg mb-2 flex justify-between cursor-pointer"
-        >
-          Speciality
-          <span>{expandedSections.specialties ? "−" : "+"}</span>
-        </h3>
-        {expandedSections.specialties && (
-          <div className="flex flex-col space-y-2 max-h-64 overflow-y-auto">
-            {allSpecialties.map((specialty) => (
-              <label key={specialty} className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  data-testid={`filter-specialty-${getSpecialtyTestId(specialty)}`}
-                  checked={selectedSpecialties.includes(specialty)}
-                  onChange={(e) => onSpecialtyChange(specialty, e.target.checked)}
-                  className="h-4 w-4"
-                />
-                <span>{specialty}</span>
-              </label>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Sort Filter */}
-      <div>
-        <h3 
-          data-testid="filter-header-sort" 
-          onClick={() => toggleSection("sort")}
-          className="font-semibold text-lg mb-2 flex justify-between cursor-pointer"
-        >
-          Sort By
-          <span>{expandedSections.sort ? "−" : "+"}</span>
-        </h3>
-        {expandedSections.sort && (
-          <div className="flex flex-col space-y-2">
-            <label className="flex items-center space-x-2">
+        {/* Sort By */}
+        <Collapsible defaultOpen={true} className="space-y-2">
+          <CollapsibleTrigger 
+            className="flex items-center justify-between w-full"
+            data-testid="filter-header-sort"
+          >
+            <h3 className="text-sm font-medium">Sort By</h3>
+            <span>{expandedSections.sort ? "−" : "+"}</span>
+          </CollapsibleTrigger>
+          <CollapsibleContent className="space-y-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 data-testid="sort-fees"
@@ -129,7 +169,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               />
               <span>Fees (Low to High)</span>
             </label>
-            <label className="flex items-center space-x-2">
+            <label className="flex items-center space-x-2 text-sm">
               <input
                 type="radio"
                 data-testid="sort-experience"
@@ -139,10 +179,10 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
               />
               <span>Experience (High to Low)</span>
             </label>
-          </div>
-        )}
-      </div>
-    </div>
+          </CollapsibleContent>
+        </Collapsible>
+      </CardContent>
+    </Card>
   );
 };
 
