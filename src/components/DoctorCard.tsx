@@ -6,6 +6,19 @@ interface DoctorCardProps {
 }
 
 const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
+  // Add safeguards for potentially undefined properties
+  const {
+    name,
+    designation,
+    specialties = [], // Default to empty array if undefined
+    experience,
+    fees,
+    qualification,
+    languagesSpoken = [], // Default to empty array if undefined
+    consultationMode = [], // Default to empty array if undefined
+    rating
+  } = doctor;
+
   return (
     <div
       data-testid="doctor-card"
@@ -13,41 +26,41 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
     >
       <div className="flex justify-between mb-2">
         <h2 data-testid="doctor-name" className="text-xl font-semibold text-gray-800">
-          {doctor.name}
+          {name}
         </h2>
         <div className="flex items-center">
           <span className="bg-green-50 text-green-700 px-2 py-1 rounded text-sm">
-            {doctor.rating} ★
+            {rating} ★
           </span>
         </div>
       </div>
 
-      <p className="text-gray-600 mb-2">{doctor.designation}</p>
+      <p className="text-gray-600 mb-2">{designation}</p>
 
       <div className="mb-2">
         <span data-testid="doctor-specialty" className="text-gray-700 font-medium">
-          {doctor.specialties.join(", ")}
+          {specialties.join(", ")}
         </span>
       </div>
 
       <div className="flex flex-wrap gap-2 mb-3">
         <span data-testid="doctor-experience" className="text-sm bg-blue-50 text-blue-700 px-2 py-1 rounded">
-          {doctor.experience} years experience
+          {experience} years experience
         </span>
         <span data-testid="doctor-fee" className="text-sm bg-purple-50 text-purple-700 px-2 py-1 rounded">
-          ₹{doctor.fees} Consultation Fee
+          ₹{fees} Consultation Fee
         </span>
       </div>
 
       <div className="text-sm text-gray-600 mb-3">
-        <p>{doctor.qualification}</p>
-        <p>Languages: {doctor.languagesSpoken.join(", ")}</p>
+        <p>{qualification}</p>
+        <p>Languages: {languagesSpoken.join(", ")}</p>
       </div>
 
       <div className="mb-3 text-sm">
         <p className="font-medium">Available for:</p>
         <div className="flex gap-2 mt-1">
-          {doctor.consultationMode.map((mode) => (
+          {consultationMode.map((mode) => (
             <span
               key={mode}
               className={`px-2 py-1 rounded ${
