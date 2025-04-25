@@ -35,6 +35,8 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
   };
 
   const getSpecialtyTestId = (specialty: string) => {
+    // Fix: Add a null check before using replace
+    if (!specialty) return "";
     // Format specialty for data-testid (replace spaces and special chars)
     return specialty.replace(/[^a-zA-Z0-9]/g, "-");
   };
