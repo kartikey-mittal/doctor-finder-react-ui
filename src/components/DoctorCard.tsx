@@ -33,7 +33,7 @@ const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
             {name}
           </h2>
           <p data-testid="doctor-specialty" className="text-gray-600">
-            {specialties.join(", ")}
+            {Array.isArray(specialties) ? specialties.join(", ") : ""}
           </p>
           <p className="text-gray-500 text-sm mt-1">
             {qualification}
