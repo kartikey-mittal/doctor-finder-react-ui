@@ -1,29 +1,20 @@
-
-import { Doctor } from "@/types/doctor";
 import { useState, useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 
-interface SearchBarProps {
-  suggestions: Doctor[];
-  onSearchChange: (value: string) => void;
-  onSuggestionClick: (doctor: Doctor) => void;
-  searchTerm: string;
-}
-
-const SearchBar: React.FC<SearchBarProps> = ({
+const SearchBar = ({
   suggestions,
   onSearchChange,
   onSuggestionClick,
   searchTerm,
 }) => {
   const [showSuggestions, setShowSuggestions] = useState(false);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
+  const suggestionsRef = useRef(null);
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
+    const handleClickOutside = (event) => {
       if (
         suggestionsRef.current &&
-        !suggestionsRef.current.contains(event.target as Node)
+        !suggestionsRef.current.contains(event.target)
       ) {
         setShowSuggestions(false);
       }

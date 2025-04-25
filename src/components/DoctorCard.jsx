@@ -1,13 +1,7 @@
-
-import { Doctor } from "@/types/doctor";
 import { Button } from "@/components/ui/button";
 import { MapPin, Building } from "lucide-react";
 
-interface DoctorCardProps {
-  doctor: Doctor;
-}
-
-const DoctorCard: React.FC<DoctorCardProps> = ({ doctor }) => {
+const DoctorCard = ({ doctor }) => {
   const {
     name,
     designation,

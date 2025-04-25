@@ -1,9 +1,7 @@
 
-import { Doctor } from "@/types/doctor";
-
 const API_URL = "https://srijandubey.github.io/campus-api-mock/SRM-C1-25.json";
 
-export const fetchDoctors = async (): Promise<Doctor[]> => {
+export const fetchDoctors = async () => {
   try {
     const response = await fetch(API_URL);
     if (!response.ok) {

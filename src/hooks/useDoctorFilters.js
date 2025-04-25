@@ -1,30 +1,19 @@
 
-import { Doctor } from "@/types/doctor";
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 
-export type ConsultationType = "Video Consult" | "In Clinic" | "";
-export type SortOption = "fees" | "experience" | "";
-
-interface DoctorFilters {
-  searchTerm: string;
-  consultationType: ConsultationType;
-  selectedSpecialties: string[];
-  sortBy: SortOption;
-}
-
-export const useDoctorFilters = (doctors: Doctor[]) => {
+export const useDoctorFilters = (doctors) => {
   const [searchParams, setSearchParams] = useSearchParams();
   
-  const [filters, setFilters] = useState<DoctorFilters>({
+  const [filters, setFilters] = useState({
     searchTerm: searchParams.get("search") || "",
-    consultationType: (searchParams.get("consultType") as ConsultationType) || "",
+    consultationType: searchParams.get("consultType") || "",
     selectedSpecialties: searchParams.get("specialties")?.split(",").filter(Boolean) || [],
-    sortBy: (searchParams.get("sortBy") as SortOption) || "",
+    sortBy: searchParams.get("sortBy") || "",
   });
 
-  const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>(doctors);
-  const [suggestions, setSuggestions] = useState<Doctor[]>([]);
+  const [filteredDoctors, setFilteredDoctors] = useState(doctors);
+  const [suggestions, setSuggestions] = useState([]);
 
   // Extract unique specialties from all doctors
   const allSpecialties = [...new Set(doctors.flatMap(doctor => doctor.specialties))].sort();
@@ -56,21 +45,18 @@ export const useDoctorFilters = (doctors: Doctor[]) => {
   useEffect(() => {
     let result = [...doctors];
 
-    // Filter by search term
     if (filters.searchTerm) {
       result = result.filter(doctor => 
         doctor.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
       );
     }
 
-    // Filter by consultation type
     if (filters.consultationType) {
       result = result.filter(doctor => 
         doctor.consultationMode.includes(filters.consultationType)
       );
     }
 
-    // Filter by specialties
     if (filters.selectedSpecialties.length > 0) {
       result = result.filter(doctor => 
         filters.selectedSpecialties.some(specialty => 
@@ -79,7 +65,6 @@ export const useDoctorFilters = (doctors: Doctor[]) => {
       );
     }
 
-    // Sort doctors
     if (filters.sortBy === "fees") {
       result.sort((a, b) => a.fees - b.fees);
     } else if (filters.sortBy === "experience") {
@@ -96,27 +81,29 @@ export const useDoctorFilters = (doctors: Doctor[]) => {
       return;
     }
 
-    const matchedDoctors = doctors.filter(doctor =>
-      doctor.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
-    ).slice(0, 3);
+    const matchedDoctors = doctors
+      .filter(doctor =>
+        doctor.name.toLowerCase().includes(filters.searchTerm.toLowerCase())
+      )
+      .slice(0, 3);
 
     setSuggestions(matchedDoctors);
   }, [doctors, filters.searchTerm]);
 
-  const handleSearchChange = (value: string) => {
+  const handleSearchChange = (value) => {
     setFilters(prev => ({ ...prev, searchTerm: value }));
   };
 
-  const handleSuggestionClick = (doctor: Doctor) => {
+  const handleSuggestionClick = (doctor) => {
     setFilters(prev => ({ ...prev, searchTerm: doctor.name }));
     setSuggestions([]);
   };
 
-  const handleConsultationTypeChange = (type: ConsultationType) => {
+  const handleConsultationTypeChange = (type) => {
     setFilters(prev => ({ ...prev, consultationType: type }));
   };
 
-  const handleSpecialtyChange = (specialty: string, isChecked: boolean) => {
+  const handleSpecialtyChange = (specialty, isChecked) => {
     setFilters(prev => ({
       ...prev,
       selectedSpecialties: isChecked 
@@ -125,7 +112,7 @@ export const useDoctorFilters = (doctors: Doctor[]) => {
     }));
   };
 
-  const handleSortChange = (option: SortOption) => {
+  const handleSortChange = (option) => {
     setFilters(prev => ({ ...prev, sortBy: option }));
   };
 

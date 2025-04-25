@@ -1,12 +1,7 @@
 
-import { Doctor } from "@/types/doctor";
 import DoctorCard from "./DoctorCard";
 
-interface DoctorListProps {
-  doctors: Doctor[];
-}
-
-const DoctorList: React.FC<DoctorListProps> = ({ doctors }) => {
+const DoctorList = ({ doctors }) => {
   if (doctors.length === 0) {
     return (
       <div className="text-center py-8">

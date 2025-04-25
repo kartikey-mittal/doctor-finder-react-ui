@@ -1,5 +1,3 @@
-
-import { ConsultationType, SortOption } from "@/hooks/useDoctorFilters";
 import { useState } from "react";
 import { Search } from "lucide-react";
 import { Input } from "./ui/input";
@@ -16,17 +14,7 @@ import {
   CollapsibleTrigger,
 } from "./ui/collapsible";
 
-interface FilterPanelProps {
-  allSpecialties: string[];
-  selectedSpecialties: string[];
-  consultationType: ConsultationType;
-  sortBy: SortOption;
-  onConsultationTypeChange: (type: ConsultationType) => void;
-  onSpecialtyChange: (specialty: string, isChecked: boolean) => void;
-  onSortChange: (option: SortOption) => void;
-}
-
-const FilterPanel: React.FC<FilterPanelProps> = ({
+const FilterPanel = ({
   allSpecialties,
   selectedSpecialties,
   consultationType,
@@ -42,14 +30,13 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     sort: true,
   });
 
-  const toggleSection = (section: keyof typeof expandedSections) => {
+  const toggleSection = (section) => {
     setExpandedSections((prev) => ({
       ...prev,
       [section]: !prev[section],
     }));
   };
 
-  // Fix: Check if each specialty is defined before calling toLowerCase
   const filteredSpecialties = allSpecialties.filter(specialty =>
     specialty && specialty.toLowerCase().includes(searchTerm.toLowerCase())
   );
